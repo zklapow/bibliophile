@@ -11,6 +11,8 @@ import (
     "github.com/codegangsta/negroni"
     "fmt"
     "github.com/zklapow/bibliophile/util"
+    "gopkg.in/tylerb/graceful.v1"
+    "time"
 )
 
 var (
@@ -41,5 +43,7 @@ func Start(port int, redisServer string) {
 
     n := negroni.New(negroni.NewRecovery(), xrequestid.New(16), negronilogrus.NewMiddleware())
     n.UseHandler(m)
-    n.Run(fmt.Sprintf(":%v", port))
+
+    logrus.Infof("Starting server on port %v", port)
+    graceful.Run(fmt.Sprintf(":%v", port), 10*time.Second, n)
 }

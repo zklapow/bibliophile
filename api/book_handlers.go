@@ -6,6 +6,7 @@ import (
     "github.com/Sirupsen/logrus"
     "github.com/pquerna/ffjson/ffjson"
     "strconv"
+    "github.com/zklapow/bibliophile/util"
 )
 
 type BookHandler struct {
@@ -38,6 +39,6 @@ func (h *BookHandler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
         return
     }
 
-    resp.Header().Add("Content-Type", "application/json")
+    util.ReturnsJSON(resp)
     resp.Write(json)
 }
