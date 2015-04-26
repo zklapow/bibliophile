@@ -31,7 +31,15 @@ func (b *Books) GetAndWatch(id int64) (*models.Book, error) {
 func (b *Books) getInternal(key string, conn redis.Conn) (*models.Book, error) {
     data, err := redis.String(conn.Do("GET", key))
     if err != nil {
+        if err.Error() == redis.ErrNil.Error() {
+            return nil, nil
+        }
+
         return nil, err
+    }
+
+    if data == "" {
+        return nil, nil
     }
 
     var book models.Book

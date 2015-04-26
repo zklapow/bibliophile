@@ -11,7 +11,7 @@ import (
 
 type BookHandler struct {
     Books *persist.Books `inject:""`
-    Logger *logrus.Logger
+    Logger *logrus.Logger `inject:""`
 }
 
 func (h *BookHandler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
@@ -29,6 +29,11 @@ func (h *BookHandler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
     if err != nil {
         resp.WriteHeader(http.StatusInternalServerError)
         log.Errorf("Error fetching book %v", err)
+        return
+    }
+
+    if book == nil {
+        resp.WriteHeader(http.StatusNotFound)
         return
     }
 

@@ -26,7 +26,10 @@ func Start(port int, redisServer string) {
     var books persist.Books
     var bookHandler BookHandler
 
-    err := g.Provide(&inject.Object{Value: pool}, &inject.Object{Value: &books}, &inject.Object{Value: &bookHandler})
+    err := g.Provide(&inject.Object{Value: pool},
+                     &inject.Object{Value: &books},
+                     &inject.Object{Value: &bookHandler},
+                     &inject.Object{Value: log})
     if err != nil {
         log.Errorf("Error building dep graph: %v", err)
         os.Exit(1)
