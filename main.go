@@ -3,7 +3,6 @@ package main
 import (
     "github.com/zklapow/bibliophile/models"
     "time"
-    "github.com/pquerna/ffjson/ffjson"
     "github.com/garyburd/redigo/redis"
     "flag"
     "github.com/facebookgo/inject"
@@ -37,13 +36,31 @@ func main() {
 
     book := &models.Book{Created: time.Now().Unix(), Title: "test", Author: "testAuthor", Finished: false}
 
-    data, err := ffjson.Marshal(book)
-    if err != nil {
-        log.Errorf("Error encoding book: %v", err)
-        return
+    if err := books.Create(book); err != nil {
+        log.Errorf("Error writing book: %v", err)
+        os.Exit(1)
     }
 
-    log.Infof("Encoded book to JSON: %v", string(data))
+    count, err := books.Count()
+    if err != nil {
+        log.Errorf("Error getting book count: %v", err)
+        os.Exit(1)
+    }
+
+    log.Infof("There are %v books in redis", count)
+
+    id := book.Id
+    book, err = books.Get(id)
+    if err != nil {
+        log.Errorf("Error getting book from redis: %v", err)
+        os.Exit(1)
+    }
+
+    if book.Id != id {
+        log.Errorf("ID %v does not match fetched ID %v", id, book.Id)
+    }
+
+    log.Infof("Got book from redis: %v", book)
 }
 
 func buildPool(server string) *redis.Pool {
@@ -62,8 +79,4 @@ func buildPool(server string) *redis.Pool {
             return err
         },
     }
-}
-
-func upsertBook(book *models.Book) error {
-    return nil
 }

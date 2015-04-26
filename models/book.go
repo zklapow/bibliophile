@@ -3,6 +3,7 @@
 package models
 
 type Book struct {
+    Id         int64;
     Created    int64;
 
     Title      string;
