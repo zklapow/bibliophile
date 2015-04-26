@@ -22,3 +22,12 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# IntelliJ
+
+.idea
+*.iml
+
+# ffjson
+
+*_ffjson.go
