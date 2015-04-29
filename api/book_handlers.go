@@ -1,49 +1,42 @@
 package api
+
 import (
     "github.com/zklapow/bibliophile/persist"
     "net/http"
     "github.com/gorilla/mux"
-    "github.com/Sirupsen/logrus"
-    "github.com/pquerna/ffjson/ffjson"
     "strconv"
-    "github.com/zklapow/bibliophile/util"
+    "github.com/zklapow/bibliophile/models"
 )
 
 type BookHandler struct {
+    JsonRestHttpHandler
     Books *persist.Books `inject:""`
-    Logger *logrus.Logger `inject:""`
 }
 
-func (h *BookHandler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+func (h *BookHandler) Get(resp http.ResponseWriter, req *http.Request) (int, interface{}) {
     vars := mux.Vars(req)
     id, err := strconv.ParseInt(vars["id"], 0, 64)
     if err != nil {
-        resp.WriteHeader(http.StatusBadRequest)
-        resp.Write([]byte("ID must be an int"))
-        return
+        return http.StatusBadRequest, models.NewJsonError("ID must be an int")
     }
 
-    log := h.Logger.WithField("book", id)
+    log := h.Log.WithField("book", id)
 
     book, err := h.Books.Get(id)
     if err != nil {
-        resp.WriteHeader(http.StatusInternalServerError)
         log.Errorf("Error fetching book %v", err)
-        return
+        return http.StatusInternalServerError, nil
     }
 
     if book == nil {
-        resp.WriteHeader(http.StatusNotFound)
-        return
+        return http.StatusNotFound, nil
     }
 
-    json, err := ffjson.Marshal(book)
-    if err != nil {
-        resp.WriteHeader(http.StatusInternalServerError)
-        log.Errorf("Error marshalling book: %v", err)
-        return
-    }
+    return http.StatusOK, book
+}
 
-    util.ReturnsJSON(resp)
-    resp.Write(json)
+func NewBookHandler() *BookHandler {
+    handler := &BookHandler{}
+    handler.JsonRestHttpHandler.Handler = handler
+    return handler
 }

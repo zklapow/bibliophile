@@ -16,7 +16,7 @@ import (
 )
 
 var (
-    log = logrus.New()
+    logger = logrus.New()
 )
 
 func Start(port int, redisServer string) {
@@ -24,25 +24,25 @@ func Start(port int, redisServer string) {
 
     pool := util.BuildPool(redisServer)
     var books persist.Books
-    var bookHandler BookHandler
+    bookHandler := NewBookHandler()
 
     err := g.Provide(&inject.Object{Value: pool},
                      &inject.Object{Value: &books},
-                     &inject.Object{Value: &bookHandler},
-                     &inject.Object{Value: log})
+                     &inject.Object{Value: bookHandler},
+                     &inject.Object{Value: logger})
     if err != nil {
-        log.Errorf("Error building dep graph: %v", err)
+        logger.Errorf("Error building dep graph: %v", err)
         os.Exit(1)
     }
 
     if err = g.Populate(); err != nil {
-        log.Errorf("Error populating graph: %v", err)
+        logger.Errorf("Error populating graph: %v", err)
         os.Exit(1)
     }
 
     m := mux.NewRouter()
     router := m.PathPrefix("/bibliophile/v1").Subrouter()
-    router.Handle("/books/{id}", &bookHandler)
+    router.Handle("/books/{id}", bookHandler)
 
     n := negroni.New(negroni.NewRecovery(), xrequestid.New(16), negronilogrus.NewMiddleware())
     n.UseHandler(m)
