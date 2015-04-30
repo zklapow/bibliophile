@@ -24,12 +24,15 @@ func Start(port int, redisServer string) {
 
     pool := util.BuildPool(redisServer)
     var books persist.Books
-    bookHandler := NewBookHandler()
+    bookHandler := &BookHandler{}
+    booksHandler := &BooksHandler{}
 
     err := g.Provide(&inject.Object{Value: pool},
                      &inject.Object{Value: &books},
                      &inject.Object{Value: bookHandler},
+                     &inject.Object{Value: booksHandler},
                      &inject.Object{Value: logger})
+
     if err != nil {
         logger.Errorf("Error building dep graph: %v", err)
         os.Exit(1)
@@ -42,7 +45,8 @@ func Start(port int, redisServer string) {
 
     m := mux.NewRouter()
     router := m.PathPrefix("/bibliophile/v1").Subrouter()
-    router.Handle("/books/{id}", bookHandler)
+    router.HandleFunc("/books/{id}", requestHandler(bookHandler))
+    router.HandleFunc("/books", requestHandler(booksHandler))
 
     n := negroni.New(negroni.NewRecovery(), xrequestid.New(16), negronilogrus.NewMiddleware())
     n.UseHandler(m)

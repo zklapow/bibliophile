@@ -4,6 +4,7 @@ import (
     "github.com/zklapow/bibliophile/models"
     "github.com/pquerna/ffjson/ffjson"
     "fmt"
+    "time"
 )
 
 const idKey = "id:books"
@@ -76,6 +77,9 @@ func (b *Books) Create(book *models.Book) error {
     }
 
     book.Id = id
+    if book.Created == 0 {
+        book.Created = time.Now().Unix()
+    }
 
     key := getKey(id)
     data, err := ffjson.Marshal(book)

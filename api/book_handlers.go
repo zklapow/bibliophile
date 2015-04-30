@@ -6,11 +6,16 @@ import (
     "github.com/gorilla/mux"
     "strconv"
     "github.com/zklapow/bibliophile/models"
+    "io/ioutil"
+    "github.com/pquerna/ffjson/ffjson"
+    "fmt"
 )
 
 type BookHandler struct {
-    JsonRestHttpHandler
+    InjectLogger
     Books *persist.Books `inject:""`
+
+    PostNotAllowed
 }
 
 func (h *BookHandler) Get(resp http.ResponseWriter, req *http.Request) (int, interface{}) {
@@ -35,8 +40,35 @@ func (h *BookHandler) Get(resp http.ResponseWriter, req *http.Request) (int, int
     return http.StatusOK, book
 }
 
-func NewBookHandler() *BookHandler {
-    handler := &BookHandler{}
-    handler.JsonRestHttpHandler.Handler = handler
-    return handler
+type BooksHandler struct {
+    InjectLogger
+    Books *persist.Books `inject:""`
+}
+
+func (h *BooksHandler) Get(resp http.ResponseWriter, req *http.Request) (int, interface{}) {
+    c, err := h.Books.Count()
+    if err != nil {
+        return http.StatusInternalServerError, models.NewJsonError(fmt.Sprintf("Error getting count: %v", err))
+    }
+
+    return http.StatusOK, c
+}
+
+func (h *BooksHandler) Post(resp http.ResponseWriter, req *http.Request) (int, interface{}) {
+    data, err := ioutil.ReadAll(req.Body)
+    if err != nil {
+        h.Log.Errorf("Error reading JSON: %v", err)
+        return http.StatusBadRequest, nil
+    }
+
+    var book models.Book
+    if err := ffjson.Unmarshal(data, &book); err != nil {
+        return http.StatusInternalServerError, models.NewJsonError(fmt.Sprintf("Could nor unmarshal JSON: %v", err))
+    }
+
+    if err = h.Books.Create(&book); err != nil {
+        return http.StatusInternalServerError, models.NewJsonError(fmt.Sprintf("Error writing to database: %v", err))
+    }
+
+    return http.StatusNoContent, book
 }
