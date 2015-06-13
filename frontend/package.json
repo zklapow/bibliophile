@@ -1,0 +1,20 @@
+{
+  "name": "bibliophile-frontend",
+  "version": "1.0.0",
+  "description": "It's a demo for react with es6 and brunch.",
+  "scripts": {},
+  "author": "zklapow@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "babel-brunch": "^5.0.0",
+    "brunch": "^1.8.3",
+    "css-brunch": "^1.7.0",
+    "javascript-brunch": "^1.7.1",
+    "sass-brunch": "1.8.10",
+    "jade-brunch": "1.8.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/zklapow/bibliophile.git"
+  }
+}

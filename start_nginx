@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+nginx -c /Users/zklapow/dev/go/src/github.com/zklapow/bibliophile/nginx.conf

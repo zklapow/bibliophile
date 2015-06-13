@@ -46,12 +46,12 @@ type BooksHandler struct {
 }
 
 func (h *BooksHandler) Get(resp http.ResponseWriter, req *http.Request) (int, interface{}) {
-    c, err := h.Books.Count()
+    books, err := h.Books.GetAll()
     if err != nil {
-        return http.StatusInternalServerError, models.NewJsonError(fmt.Sprintf("Error getting count: %v", err))
+        return http.StatusInternalServerError, models.NewJsonError(fmt.Sprintf("Could not get books: %v", err))
     }
 
-    return http.StatusOK, c
+    return http.StatusOK, books
 }
 
 func (h *BooksHandler) Post(resp http.ResponseWriter, req *http.Request) (int, interface{}) {

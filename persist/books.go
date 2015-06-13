@@ -105,6 +105,35 @@ func (b *Books) Count() (int64, error) {
     return count, nil
 }
 
+func (b *Books) GetAll() ([]*models.Book, error) {
+    conn := b.Pool.Get()
+    keys, err := redis.Values(conn.Do("KEYS", "book:*"))
+    if err != nil {
+        return nil, err
+    }
+
+    resp, err := redis.Values(conn.Do("MGET", keys...))
+    if err != nil {
+        return nil, err
+    }
+
+    var items [][]byte
+    redis.ScanSlice(resp, &items)
+
+    books := make([]*models.Book, len(items))
+    for i, data := range items {
+        var book = new(models.Book)
+        err = ffjson.Unmarshal(data, book)
+        if err != nil {
+            return nil, err
+        }
+
+        books[i] = book
+    }
+
+    return books, nil
+}
+
 func getKey(id int64) string {
     return fmt.Sprintf("book:%v", id)
 }

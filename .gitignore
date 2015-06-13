@@ -34,3 +34,7 @@ _testmain.go
 
 # binaries
 bibliophile
+
+# static
+node_modules/
+build/
