@@ -1,5 +1,15 @@
 @import "base";
 
 body {
-    background: white;
+  background: white;
 }
+
+.booklist {
+  list-style-type: none;
+}
+
+.cover-image {
+  margin-top: 0px;
+  padding-right: 10px;
+}
+

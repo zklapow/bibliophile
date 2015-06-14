@@ -8,6 +8,13 @@
     "fetch": "~0.7.0",
     "eventEmitter": "~4.2.11",
     "general-store": "~0.2.2",
-    "jquery": "~2.1.4"
+    "jquery": "~2.1.4",
+    "foundation": "~5.5.2",
+    "modernizr": "~2.8.3"
+  },
+  "overrides": {
+    "modernizr": {
+      "main": "modernizr.js"
+    }
   }
 }

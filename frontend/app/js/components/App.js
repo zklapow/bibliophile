@@ -31,8 +31,10 @@ export default class App extends React.Component {
 
 	render() {
 		return (
-            <div>
-                <BookList books={this.state.books}/>
+            <div className="row">
+                <div className="large-8 large-centered columns">
+                    <BookList books={this.state.books}/>
+                </div>
             </div>
 	    )
 	}

@@ -5,13 +5,21 @@ export default class BookList extends React.Component {
         var rows = [];
 
         for (var book of this.props.books) {
-            rows.push(<BookItem book={book} />);
+            rows.push(
+                <li>
+                    <div className="panel clearfix">
+                        <BookItem book={book} />
+                    </div>
+                </li>
+            );
         }
 
         return (
-            <ul>
-                {rows}
-            </ul>
+            <div>
+                <ul className="booklist">
+                    {rows}
+                </ul>
+            </div>
         )
     }
 }

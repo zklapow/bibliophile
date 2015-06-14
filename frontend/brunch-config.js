@@ -17,13 +17,16 @@ exports.config = {
           'bower_components/flux/dist/Flux.js',
           'bower_components/fetch/fetch.js',
           'bower_components/general-store/build/general-store.js',
-          'bower_components/jquery/dist/jquery.js'
+          'bower_components/jquery/dist/jquery.js',
         ],
+        'js/bower.js': /^bower_components/,
         'js/app.js': /^app/
       }
     },
     stylesheets: {
-      joinTo: 'styles/app.scss'
+      joinTo: {
+        'styles/app.css': /^(app|bower_components)/
+      }
     }
   },
   onCompile: function() {
